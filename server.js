@@ -123,7 +123,7 @@ app.get("/login.html", (req, res) => {
 
 app.get("/logout", (req, res) => {
   req.session.destroy(() => {
-    res.redirect("public/login.html");
+    res.redirect("/login.html");
   });
 });
 
@@ -454,9 +454,10 @@ http://localhost:3000/api/relatorio/comparar/pdf/PAC_01/2026-01/2026-02
 // =====================================================
 // START DO SERVIDOR
 // =====================================================
+
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log("🚀 Servidor EnergyControl rodando");
   console.log(`🌐 Porta: ${PORT}`);
 });
@@ -464,8 +465,10 @@ app.listen(PORT, () => {
 
 
 
-//app.listen(3000, () => {
-//  console.log("🚀 Servidor PAC4200 rodando");
-//  console.log("🌐 http://localhost:3000");
-//});
 
+
+
+//app.listen(3000, () => {
+///  console.log("🚀 Servidor PAC4200 rodando");
+//  console.log("🌐 http://localhost:3000");
+//
