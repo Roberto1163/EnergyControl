@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard PAC4200</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body{font-family:Arial;background:#f2f4f7;padding:20px}
+    .card{background:#fff;padding:20px;border-radius:8px;max-width:900px;margin:auto}
+    .valor{font-size:24px;color:#0077cc}
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Dashboard Energia</h1>
+
+  <label>Medidor:</label>
+  <select id="pacSelect"></select>
+
+  <p class="valor">
+    Consumo hoje: <span id="consumo">--</span> kWh
+  </p>
+
+  <canvas id="grafico"></canvas>
+</div>
+
+<script>
+let chart;
+
+async function carregarPACs() {
+  const pacs = await fetch("/api/pacs").then(r => r.json());
+  const sel = document.getElementById("pacSelect");
+
+  pacs.forEach(p => {
+    const o = document.createElement("option");
+    o.value = p.id;
+    o.text = p.nome;
+    sel.add(o);
+  });
+
+  sel.onchange = atualizar;
+  atualizar();
+}
+
+async function atualizar() {
+  const pac = document.getElementById("pacSelect").value;
+
+  const dia = await fetch(`/api/pac/${pac}/energia-diaria`).then(r => r.json());
+  document.getElementById("consumo").innerText =
+    dia.consumo_kwh.toFixed(2);
+
+  const hist = await fetch(`/api/pac/${pac}/historico`).then(r => r.json());
+
+  if (chart) chart.destroy();
+  chart = new Chart(document.getElementById("grafico"), {
+    type: "bar",
+    data: {
+      labels: hist.map(h => h.data),
+      datasets: [{
+        label: "Consumo Diário (kWh)",
+        data: hist.map(h => h.consumo_kwh)
+      }]
+    }
+  });
+}
+
+carregarPACs();
+setInterval(atualizar, 60000);
+</script>
+
+</body>
+</html>
